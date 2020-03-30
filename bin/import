@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+
+require 'csv'
+require 'active_record'
+require 'date'
+
+ActiveRecord::Base.establish_connection(
+  adapter:  'mysql2',
+  host:     '0.0.0.0',
+  database: 'test',
+  username: 'test',
+  password: 'test'
+)
+
+filename = ARGV[0]
+
+
+def parseLatLong(s)
+  parts = s.split('(')
+  latlong = parts[parts.length-1]
+  latlong = latlong.split(')')[0].split(':')
+
+  return latlong
+end
+
+count = 0
+
+CSV.foreach(filename) do |row|
+  if row[0] != "Sighting date/time" # skip first row
+    begin
+      sighted_at = row[0]
+      shape = row[1]
+      duration_seconds = row[2]
+      comments = row[4]
+      created_at = DateTime.now
+      updated_at = DateTime.now
+      latlong = parseLatLong(row[5])
+      lat = latlong[0]
+      long = latlong[1]
+      ActiveRecord::Base.connection.execute("insert into sightings (created_at, updated_at, sighted_at, shape, duration_seconds, comments, latitude, longitude) values('#{created_at}', '#{updated_at}', '#{sighted_at}', '#{shape}', '#{duration_seconds}', '#{comments}', #{lat}, #{long});")
+    rescue
+      puts @error_message
+    end
+    count = count + 1
+
+    if count % 20 == 0
+      puts "COUNT: #{count}"
+    end
+  end
+end

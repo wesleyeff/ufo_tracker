@@ -15,7 +15,7 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   username: test
   password: test
-  host: 0.0.0.0
+  host: mysqldb
 
 development:
   <<: *default
@@ -26,7 +26,7 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: rails_test_api_test
+  database: test
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -49,6 +49,6 @@ test:
 #
 production:
   <<: *default
-  database: rails_test_api_production
-  username: rails_test_api
-  password: <%= ENV['RAILS_TEST_API_DATABASE_PASSWORD'] %>
+  database: test
+  username: test
+  password: <%= ENV['RAILS_DATABASE_PASSWORD'] %>
